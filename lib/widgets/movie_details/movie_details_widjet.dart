@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/widgets/movie_details/widgets/movie_detail_cell_info_widget.dart';
 
-import '../movie_list/models/movie.dart';
+import '../../domain/entity/movie.dart';
 
 class MovieDetailsWidget extends StatefulWidget {
   const MovieDetailsWidget({
     Key? key,
-    required this.movieId,
+    required this.movie,
   }) : super(key: key);
 
-  final Movie movieId;
+  final Movie movie;
   @override
   State<MovieDetailsWidget> createState() => _MovieDetailsWidgetState();
 }
@@ -19,7 +19,7 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.movieId.title),
+          title: Text(widget.movie.title),
           centerTitle: true,
         ),
         body: ColoredBox(

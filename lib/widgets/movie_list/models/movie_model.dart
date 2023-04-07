@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/widgets/movie_list/models/movie.dart';
+import 'package:themoviedb/domain/entity/movie.dart';
+import 'package:themoviedb/domain/movies_api_client/movies_api_client.dart';
 
 class MovieModel extends ChangeNotifier {
-  List<Movie> movie = [
-    Movie(
-        id: 5,
-        imageName: 'images/avatar.jpeg',
-        title: 'Avatar',
-        time: 'April 7, 2021',
-        description: '')
-  ];
+  final _client = MoviesApiClient();
+  List<Movie> movie = [];
 
-  push(BuildContext context) async {
-    // notifyListeners();
+  loadMovies() async {
+    final page = await _client.popularMovie();
+    movie = page.results;
+
+    notifyListeners();
   }
 }
 

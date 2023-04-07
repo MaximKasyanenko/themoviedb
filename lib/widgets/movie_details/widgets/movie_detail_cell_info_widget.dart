@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/domain/entity/movie.dart';
 import 'package:themoviedb/widgets/movie_details/models/series_cast.dart';
 
 class MovieDetailsInfoWidget extends StatelessWidget {
@@ -49,7 +50,6 @@ class _TopPostersWidget extends StatelessWidget {
 
 class _TitleWidget extends StatelessWidget {
   const _TitleWidget({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -141,10 +141,6 @@ class _OverViewWidget extends StatelessWidget {
                   'После принятия образа аватара солдат Джейк Салли становится предводителем народа нави и берет на себя миссию по защите новых друзей от корыстных бизнесменов с Земли. Теперь ему есть за кого бороться — с Джейком его прекрасная возлюбленная Нейтири. Когда на Пандору возвращаются до зубов вооруженные земляне, Джейк готов дать им отпор.',
                   style: TextStyle(fontSize: 20),
                 ),
-                Text(
-                  'После принятия образа аватара солдат Джейк Салли становится предводителем народа нави и берет на себя миссию по защите новых друзей от корыстных бизнесменов с Земли. Теперь ему есть за кого бороться — с Джейком его прекрасная возлюбленная Нейтири. Когда на Пандору возвращаются до зубов вооруженные земляне, Джейк готов дать им отпор.',
-                  style: TextStyle(fontSize: 20),
-                )
               ],
             ),
           ),

@@ -20,6 +20,11 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
   }
 
   final movieModel = MovieModel();
+  @override
+  void initState() {
+    super.initState();
+    movieModel.loadMovies();
+  }
 
   @override
   Widget build(BuildContext context) {

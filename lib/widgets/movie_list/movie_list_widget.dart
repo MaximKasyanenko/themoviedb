@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/services/navigation/navigation_service.dart';
 import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
-import 'models/movie.dart';
+import '../../domain/entity/movie.dart';
 
 class MovieListWidget extends StatelessWidget {
-  MovieListWidget({Key? key}) : super(key: key);
-  final List<Movie> _movies = [];
+  const MovieListWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final model = MovieProvider.watch(context)?.model;
     if (model == null) {
-      return const Center(child: Text('Что-то пошло не так'));
+      return const Center(child: Text('упс..'));
     }
     return Stack(
       children: [
@@ -51,6 +50,7 @@ class CellMovesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final posterPath = movies.posterPath;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(children: [
@@ -66,11 +66,14 @@ class CellMovesWidget extends StatelessWidget {
               ]),
           child: Row(
             children: [
-              Image.asset(movies.imageName),
+              posterPath != null
+                  ? Image.network('https://image.tmdb.org/t/p/w500$posterPath',
+                      width: 95)
+                  : Image.asset('images/avatar.jpeg'),
               const SizedBox(width: 20),
               Expanded(
                 child: Column(
-                  mainAxisAlignment: movies.description == ''
+                  mainAxisAlignment: movies.overview == ''
                       ? MainAxisAlignment.center
                       : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,11 +88,11 @@ class CellMovesWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      movies.time,
+                      movies.title,
                       style: const TextStyle(color: Colors.grey),
                     ),
                     Text(
-                      movies.description,
+                      movies.overview,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
