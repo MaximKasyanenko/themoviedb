@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:themoviedb/widgets/auth/auth_widget.dart';
 import 'package:themoviedb/widgets/auth/model/auth_model.dart';
 import 'package:themoviedb/widgets/main_screen/main_screen_widget.dart';
+import 'package:themoviedb/widgets/movie_details/models/movie_detail_model.dart';
 import 'package:themoviedb/widgets/movie_details/movie_details_widjet.dart';
-import 'package:themoviedb/domain/entity/movie.dart';
+import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 
 class MainNavigationRoutesName {
   static const auth = 'auth';
@@ -21,8 +22,9 @@ class MainNavigation {
         AuthProvider(model: AuthModel(), child: const AuthWidget()),
     MainNavigationRoutesName.mainScreen: (context) => const MainScreenWidget(),
     MainNavigationRoutesName.movieDetails: (context) {
-      final movieId = ModalRoute.of(context)!.settings.arguments as Movie;
-      return MovieDetailsWidget(movie: movieId);
+      final movieId = ModalRoute.of(context)!.settings.arguments as int;
+      return MovieDetailProvider(
+          model: MovieDetailModel(movieId), child: const MovieDetailsWidget());
     }
   };
 }

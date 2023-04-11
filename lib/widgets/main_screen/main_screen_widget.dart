@@ -12,6 +12,7 @@ class MainScreenWidget extends StatefulWidget {
 
 class _MainScreenWidgetState extends State<MainScreenWidget> {
   int _selectedPage = 0;
+  final List<String> _titles = const ['Новости', 'Фильмы', 'Сериали'];
   void _selectTap(int index) {
     if (_selectedPage == index) return;
     setState(() {
@@ -23,6 +24,12 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    movieModel.setupLocale(context);
     movieModel.loadMovies();
   }
 
@@ -38,22 +45,25 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
             icon: const Icon(Icons.assignment_ind_outlined),
           )
         ],
-        title: const Text('TMDB'),
+        title: Text(_titles[_selectedPage]),
         centerTitle: true,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPage,
         onTap: _selectTap,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Новости'),
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Фильмы'),
-          BottomNavigationBarItem(icon: Icon(Icons.tv), label: 'Сериали'),
+        items: [
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.home), label: _titles[0]),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.movie), label: _titles[1]),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.tv), label: _titles[2]),
         ],
       ),
       body: IndexedStack(index: _selectedPage, children: [
-        const Text('Index 0: Новости'),
         MovieProvider(model: movieModel, child: MovieListWidget()),
-        const Text('Index 2: Сериали'),
+        MovieProvider(model: movieModel, child: MovieListWidget()),
+        MovieProvider(model: movieModel, child: MovieListWidget()),
       ]),
     );
   }

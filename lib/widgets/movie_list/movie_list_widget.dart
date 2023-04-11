@@ -4,7 +4,8 @@ import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 import '../../domain/entity/movie.dart';
 
 class MovieListWidget extends StatelessWidget {
-  const MovieListWidget({Key? key}) : super(key: key);
+  MovieListWidget({Key? key}) : super(key: key);
+  final _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final model = MovieProvider.watch(context)?.model;
@@ -13,19 +14,41 @@ class MovieListWidget extends StatelessWidget {
     }
     return Stack(
       children: [
-        ListView.builder(
-            padding: const EdgeInsets.only(top: 70),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: model.movie.length,
-            itemExtent: 163,
-            itemBuilder: (BuildContext context, int index) {
-              return CellMovesWidget(
-                  index: index + 1, movies: model.movie[index]);
-            }),
+        model.movie.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 70),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                itemCount: model.movie.length,
+                itemExtent: 180,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index == model.movie.length - 2) {
+                    model.showMoviesAtIndex();
+                  }
+                  return CellMovesWidget(
+                      index: index + 1, movies: model.movie[index]);
+                }),
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
+            controller: _controller,
+            textInputAction: TextInputAction.search,
+            textCapitalization: TextCapitalization.words,
+            onSubmitted: (value) {
+              if (value != '') {
+                model.searchMoviesOfName(query: value.toLowerCase());
+              }
+            },
             decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _controller.clear();
+                  FocusScope.of(context).unfocus();
+                  model.loadMovies();
+                },
+                icon: const Icon(Icons.cancel),
+              ),
               labelText: 'Поиск',
               border: const OutlineInputBorder(),
               filled: true,
@@ -51,25 +74,49 @@ class CellMovesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final posterPath = movies.posterPath;
+    final model = MovieProvider.read(context)?.model;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(children: [
         Container(
-          clipBehavior: Clip.hardEdge,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
           decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: Colors.black.withOpacity(0.2)),
               borderRadius: const BorderRadius.all(Radius.circular(10)),
               boxShadow: const [
                 BoxShadow(
-                    color: Colors.grey, blurRadius: 5, offset: Offset(0, 2))
+                    color: Colors.grey, blurRadius: 5, offset: Offset(-1, 2))
               ]),
           child: Row(
             children: [
-              posterPath != null
-                  ? Image.network('https://image.tmdb.org/t/p/w500$posterPath',
-                      width: 95)
-                  : Image.asset('images/avatar.jpeg'),
+              SizedBox(
+                width: 105,
+                height: 180,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                  ),
+                  child: Image.network(
+                    'https://image.tmdb.org/t/p/w500$posterPath',
+                    fit: BoxFit.fill,
+                    loadingBuilder: (context, child, progress) {
+                      return progress == null
+                          ? child
+                          : const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                    },
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return const Center(
+                        child: Text('yps'),
+                      );
+                    },
+                  ),
+                ),
+              ),
               const SizedBox(width: 20),
               Expanded(
                 child: Column(
@@ -88,7 +135,7 @@ class CellMovesWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      movies.title,
+                      model?.getDateToString(movies.releaseDate) ?? '',
                       style: const TextStyle(color: Colors.grey),
                     ),
                     Text(
@@ -115,7 +162,7 @@ class CellMovesWidget extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pushNamed(
                   MainNavigationRoutesName.movieDetails,
-                  arguments: movies);
+                  arguments: movies.id);
             },
           ),
         )

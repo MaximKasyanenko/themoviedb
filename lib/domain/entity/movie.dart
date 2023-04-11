@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
 import 'dart:convert';
 
 Future<PopularMoviePage> welcomeFromJson(Map<String, dynamic> str) async =>
@@ -75,7 +71,7 @@ class Movie {
         posterPath: json["poster_path"],
         adult: json["adult"],
         overview: json["overview"],
-        releaseDate: DateTime.parse(json["release_date"]),
+        releaseDate: DateTime.parse(json["release_date"] ?? '2222-12-01'),
         genreIds: List<int>.from(json["genre_ids"].map((x) => x)),
         id: json["id"],
         originalTitle: json["original_title"],
