@@ -3,9 +3,112 @@ import 'package:themoviedb/services/navigation/navigation_service.dart';
 import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 import '../../domain/entity/movie.dart';
 
-class MovieListWidget extends StatelessWidget {
-  MovieListWidget({Key? key}) : super(key: key);
+// class MovieListWidget extends StatelessWidget {
+//   MovieListWidget({Key? key}) : super(key: key);
+//   final _controller = TextEditingController();
+//   final _focusNode = FocusNode();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final model = MovieProvider.watch(context)?.model;
+//     if (model == null) {
+//       return const Center(child: Text('упс..'));
+//     }
+//     return Column(
+//       children: [
+//         Padding(
+//           padding: const EdgeInsets.all(10.0),
+//           child: AnimatedContainer(
+//             duration: Duration(milliseconds: 300),
+//             height: _isTextFieldVisible ? 50 : 0,
+//             child: TextField(
+//               focusNode: _focusNode,
+//               controller: _controller,
+//               textInputAction: TextInputAction.search,
+//               textCapitalization: TextCapitalization.words,
+//               onSubmitted: (value) {
+//                 if (value != '') {
+//                   model.searchMoviesOfName(query: value.toLowerCase());
+//                 }
+//               },
+//               decoration: InputDecoration(
+//                 suffixIcon: _focusNode.hasFocus
+//                     ? IconButton(
+//                         onPressed: () {
+//                           _controller.clear();
+//                           FocusScope.of(context).unfocus();
+//                           model.loadMovies();
+//                         },
+//                         icon: const Icon(Icons.cancel),
+//                       )
+//                     : null,
+//                 labelText: 'Поиск',
+//                 border: const OutlineInputBorder(),
+//                 filled: true,
+//                 fillColor: Colors.white.withAlpha(230),
+//               ),
+//             ),
+//           ),
+//         ),
+//         model.movie.isEmpty
+//             ? const Center(child: CircularProgressIndicator())
+//             : Expanded(
+//                 child: ListView.builder(
+//                     padding: const EdgeInsets.only(top: 0),
+//                     keyboardDismissBehavior:
+//                         ScrollViewKeyboardDismissBehavior.onDrag,
+//                     itemCount: model.movie.length,
+//                     itemExtent: 180,
+//                     itemBuilder: (BuildContext context, int index) {
+//                       if (index == model.movie.length - 2) {
+//                         model.showMoviesAtIndex();
+//                       }
+//                       return CellMovesWidget(
+//                           index: index + 1, movies: model.movie[index]);
+//                     }),
+//               ),
+//       ],
+//     );
+//   }
+// }
+class MovieListWidget extends StatefulWidget {
+  const MovieListWidget({Key? key}) : super(key: key);
+
+  @override
+  State<MovieListWidget> createState() => _MovieListWidgetState();
+}
+
+class _MovieListWidgetState extends State<MovieListWidget> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+  bool _showClearButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onTextChanged);
+    _focusNode.addListener(_onFocusChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _showClearButton = _controller.text.isNotEmpty;
+    });
+  }
+
+  void _onFocusChanged() {
+    setState(() {
+      _showClearButton = _focusNode.hasFocus || _controller.text.isNotEmpty;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final model = MovieProvider.watch(context)?.model;
@@ -15,7 +118,9 @@ class MovieListWidget extends StatelessWidget {
     return Stack(
       children: [
         model.movie.isEmpty
-            ? const Center(child: CircularProgressIndicator())
+            ? model.isSearchEmpty()
+                ? const Center(child: Text('Нет результатов'))
+                : const Center(child: CircularProgressIndicator())
             : ListView.builder(
                 padding: const EdgeInsets.only(top: 70),
                 keyboardDismissBehavior:
@@ -32,6 +137,7 @@ class MovieListWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
+            focusNode: _focusNode,
             controller: _controller,
             textInputAction: TextInputAction.search,
             textCapitalization: TextCapitalization.words,
@@ -41,14 +147,16 @@ class MovieListWidget extends StatelessWidget {
               }
             },
             decoration: InputDecoration(
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _controller.clear();
-                  FocusScope.of(context).unfocus();
-                  model.loadMovies();
-                },
-                icon: const Icon(Icons.cancel),
-              ),
+              suffixIcon: _showClearButton
+                  ? IconButton(
+                      onPressed: () {
+                        _controller.clear();
+                        FocusScope.of(context).unfocus();
+                        model.loadMovies();
+                      },
+                      icon: const Icon(Icons.cancel),
+                    )
+                  : null,
               labelText: 'Поиск',
               border: const OutlineInputBorder(),
               filled: true,
@@ -111,7 +219,7 @@ class CellMovesWidget extends StatelessWidget {
                     errorBuilder: (BuildContext context, Object exception,
                         StackTrace? stackTrace) {
                       return const Center(
-                        child: Text('yps'),
+                        child: Icon(Icons.error_outline, size: 50),
                       );
                     },
                   ),

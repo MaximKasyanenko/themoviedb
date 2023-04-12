@@ -43,11 +43,14 @@ class MoviesApiClient {
   // movie detail
   Future<MoviesDetail> getDetailMovies(
       {required String locale, required int id}) async {
-    final response =
-        await _client.myGet(host: _host, path: '$_pathDetail$id', parameters: {
-      'api_key': _apiKey,
-      'language': locale,
-    });
+    final response = await _client.myGet(
+        host: _host,
+        path: '$_pathDetail$id',
+        parameters: {
+          'api_key': _apiKey,
+          'language': locale,
+          'append_to_response': 'credits,videos'
+        });
     final json = await _client.myJsonDecode(response) as Map<String, dynamic>;
     final movie = moviesDetailFromJson(json);
     return movie;

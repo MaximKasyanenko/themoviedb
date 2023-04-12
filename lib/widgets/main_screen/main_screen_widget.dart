@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/data_provider/session_data_provider.dart';
+import 'package:themoviedb/services/navigation/navigation_service.dart';
 import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 import 'package:themoviedb/widgets/movie_list/movie_list_widget.dart';
 
@@ -21,6 +22,7 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
   }
 
   final movieModel = MovieModel();
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,8 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
           IconButton(
             onPressed: () {
               SessionDataProvider().setSessionId(null);
+              Navigator.pushReplacementNamed(
+                  context, MainNavigationRoutesName.auth);
             },
             icon: const Icon(Icons.assignment_ind_outlined),
           )
@@ -61,9 +65,9 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         ],
       ),
       body: IndexedStack(index: _selectedPage, children: [
-        MovieProvider(model: movieModel, child: MovieListWidget()),
-        MovieProvider(model: movieModel, child: MovieListWidget()),
-        MovieProvider(model: movieModel, child: MovieListWidget()),
+        MovieProvider(model: movieModel, child: const MovieListWidget()),
+        MovieProvider(model: movieModel, child: const MovieListWidget()),
+        MovieProvider(model: movieModel, child: const MovieListWidget()),
       ]),
     );
   }

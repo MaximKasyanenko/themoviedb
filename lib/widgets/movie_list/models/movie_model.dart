@@ -13,12 +13,18 @@ class MovieModel extends ChangeNotifier {
   var _currentPage = 1;
   var _maxPage = 1;
   var _isSearch = false;
+  int? _totalPages;
 
   searchMoviesOfName({required String query}) async {
     final pageMovie = await _client.searchMovie(locale: _locale, query: query);
     movie = pageMovie.results;
+    _totalPages = pageMovie.totalPages;
     _isSearch = true;
     notifyListeners();
+  }
+
+  bool isSearchEmpty() {
+    return _isSearch || _totalPages == 0;
   }
 
 //пагинация
@@ -60,7 +66,6 @@ class MovieModel extends ChangeNotifier {
     } on SocketException {
       Future.delayed(
           const Duration(seconds: 3), () async => await loadMovies());
-      // await loadMovies();
     }
     notifyListeners();
   }
