@@ -51,7 +51,9 @@ class _MovieTrailerWidgetState extends State<MovieTrailerWidget> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    Future.delayed(const Duration(seconds: 1), () {
+      _controller.dispose();
+    });
 
     super.dispose();
   }
@@ -70,7 +72,7 @@ class _MovieTrailerWidgetState extends State<MovieTrailerWidget> {
           const SizedBox(width: 8.0),
           Expanded(
             child: Text(
-              _controller.metadata.title,
+              _videoMetaData.title,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18.0,

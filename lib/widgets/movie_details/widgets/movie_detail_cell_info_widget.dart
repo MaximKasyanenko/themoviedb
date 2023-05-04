@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:themoviedb/domain/entity/cast.dart';
 import 'package:themoviedb/widgets/movie_details/models/movie_detail_model.dart';
 import 'package:themoviedb/widgets/movie_trailer/movie_trailer_widget.dart';
@@ -27,7 +28,7 @@ class _TopPostersWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)!.model;
+    final model = context.read<MovieDetailModel>();
 
     return Stack(
       children: [
@@ -77,8 +78,8 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)?.model;
-    final videos = model?.movie?.videos.results
+    final model = context.read<MovieDetailModel>();
+    final videos = model.movie?.videos.results
         .where((video) => video.type == 'Trailer' && video.site == 'YouTube');
     final trailerKey = videos?.isNotEmpty == true ? videos?.first.key : null;
     return Column(
@@ -87,7 +88,7 @@ class _TitleWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Text(
-            ('${model?.movie?.title} (${model?.movie?.releaseDate.year.toString()})'),
+            ('${model?.movie?.title} (${model.movie?.releaseDate.year.toString()})'),
             maxLines: 3,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -125,11 +126,6 @@ class _TitleWidget extends StatelessWidget {
                       ? null
                       : () {
                           _showPlayer(context: context, trailerKey: trailerKey);
-                          // Navigator.pushNamed(
-                          //   context,
-                          //   MainNavigationRoutesName.movieTrailer,
-                          //   arguments: trailerKey,
-                          // );
                         },
                   child: Row(
                     children: const [
@@ -150,7 +146,7 @@ class _OverViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)?.model;
+    final model = context.read<MovieDetailModel>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -169,7 +165,7 @@ class _OverViewWidget extends StatelessWidget {
                   height: 15,
                 ),
                 Text(
-                  model?.movie?.overview ?? '',
+                  model.movie?.overview ?? '',
                   style: const TextStyle(fontSize: 20),
                 ),
               ],
@@ -186,7 +182,7 @@ class _SeriesCastWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)?.model;
+    final model = context.read<MovieDetailModel>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,10 +203,10 @@ class _SeriesCastWidget extends StatelessWidget {
             trackVisibility: true,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: model?.movie?.credits.cast.length,
+                itemCount: model.movie?.credits.cast.length,
                 itemBuilder: (BuildContext context, int index) {
                   return _SeriesCastCellWidget(
-                      cast: model?.movie?.credits.cast[index]);
+                      cast: model.movie?.credits.cast[index]);
                 }),
           ),
         ),

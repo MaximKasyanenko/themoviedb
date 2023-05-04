@@ -22,27 +22,8 @@ class MovieDetailModel extends ChangeNotifier {
     if (_locale != locale) {
       _locale = locale;
       _dateFormat = DateFormat.yMMMMd(_locale);
+      await getDetailMovies();
     }
-    await getDetailMovies();
-  }
-}
-
-class MovieDetailProvider extends InheritedNotifier {
-  final MovieDetailModel model;
-  const MovieDetailProvider({
-    Key? key,
-    required this.model,
-    required Widget child,
-  }) : super(key: key, child: child, notifier: model);
-
-  static MovieDetailProvider? watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<MovieDetailProvider>();
-  }
-
-  static MovieDetailProvider? read(BuildContext context) {
-    final widget = context
-        .getElementForInheritedWidgetOfExactType<MovieDetailProvider>()
-        ?.widget;
-    return widget is MovieDetailProvider ? widget : null;
+    //await getDetailMovies();
   }
 }

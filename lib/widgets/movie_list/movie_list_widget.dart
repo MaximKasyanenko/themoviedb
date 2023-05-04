@@ -1,76 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:themoviedb/services/navigation/navigation_service.dart';
 import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 import '../../domain/entity/movie.dart';
 
-// class MovieListWidget extends StatelessWidget {
-//   MovieListWidget({Key? key}) : super(key: key);
-//   final _controller = TextEditingController();
-//   final _focusNode = FocusNode();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final model = MovieProvider.watch(context)?.model;
-//     if (model == null) {
-//       return const Center(child: Text('упс..'));
-//     }
-//     return Column(
-//       children: [
-//         Padding(
-//           padding: const EdgeInsets.all(10.0),
-//           child: AnimatedContainer(
-//             duration: Duration(milliseconds: 300),
-//             height: _isTextFieldVisible ? 50 : 0,
-//             child: TextField(
-//               focusNode: _focusNode,
-//               controller: _controller,
-//               textInputAction: TextInputAction.search,
-//               textCapitalization: TextCapitalization.words,
-//               onSubmitted: (value) {
-//                 if (value != '') {
-//                   model.searchMoviesOfName(query: value.toLowerCase());
-//                 }
-//               },
-//               decoration: InputDecoration(
-//                 suffixIcon: _focusNode.hasFocus
-//                     ? IconButton(
-//                         onPressed: () {
-//                           _controller.clear();
-//                           FocusScope.of(context).unfocus();
-//                           model.loadMovies();
-//                         },
-//                         icon: const Icon(Icons.cancel),
-//                       )
-//                     : null,
-//                 labelText: 'Поиск',
-//                 border: const OutlineInputBorder(),
-//                 filled: true,
-//                 fillColor: Colors.white.withAlpha(230),
-//               ),
-//             ),
-//           ),
-//         ),
-//         model.movie.isEmpty
-//             ? const Center(child: CircularProgressIndicator())
-//             : Expanded(
-//                 child: ListView.builder(
-//                     padding: const EdgeInsets.only(top: 0),
-//                     keyboardDismissBehavior:
-//                         ScrollViewKeyboardDismissBehavior.onDrag,
-//                     itemCount: model.movie.length,
-//                     itemExtent: 180,
-//                     itemBuilder: (BuildContext context, int index) {
-//                       if (index == model.movie.length - 2) {
-//                         model.showMoviesAtIndex();
-//                       }
-//                       return CellMovesWidget(
-//                           index: index + 1, movies: model.movie[index]);
-//                     }),
-//               ),
-//       ],
-//     );
-//   }
-// }
 class MovieListWidget extends StatefulWidget {
   const MovieListWidget({Key? key}) : super(key: key);
 
@@ -79,6 +12,46 @@ class MovieListWidget extends StatefulWidget {
 }
 
 class _MovieListWidgetState extends State<MovieListWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final model = context.watch<MovieModel>();
+    return Stack(
+      children: [
+        model.movie.isEmpty
+            ? model.isSearchEmpty()
+                ? const Center(child: Text('Нет результатов'))
+                : const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                padding: const EdgeInsets.only(top: 70),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                itemCount: model.movie.length,
+                itemExtent: 180,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index == model.movie.length - 2) {
+                    model.showMoviesAtIndex();
+                  }
+                  return CellMovesWidget(
+                      index: index + 1, movies: model.movie[index]);
+                }),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: SearchFieldWidget(),
+        )
+      ],
+    );
+  }
+}
+
+class SearchFieldWidget extends StatefulWidget {
+  const SearchFieldWidget({
+    super.key,
+  });
+  @override
+  State<SearchFieldWidget> createState() => _SearchFieldWidgetState();
+}
+
+class _SearchFieldWidgetState extends State<SearchFieldWidget> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   bool _showClearButton = false;
@@ -111,60 +84,33 @@ class _MovieListWidgetState extends State<MovieListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieProvider.watch(context)?.model;
-    if (model == null) {
-      return const Center(child: Text('упс..'));
-    }
-    return Stack(
-      children: [
-        model.movie.isEmpty
-            ? model.isSearchEmpty()
-                ? const Center(child: Text('Нет результатов'))
-                : const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 70),
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                itemCount: model.movie.length,
-                itemExtent: 180,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index == model.movie.length - 2) {
-                    model.showMoviesAtIndex();
-                  }
-                  return CellMovesWidget(
-                      index: index + 1, movies: model.movie[index]);
-                }),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: TextField(
-            focusNode: _focusNode,
-            controller: _controller,
-            textInputAction: TextInputAction.search,
-            textCapitalization: TextCapitalization.words,
-            onSubmitted: (value) {
-              if (value != '') {
-                model.searchMoviesOfName(query: value.toLowerCase());
-              }
-            },
-            decoration: InputDecoration(
-              suffixIcon: _showClearButton
-                  ? IconButton(
-                      onPressed: () {
-                        _controller.clear();
-                        FocusScope.of(context).unfocus();
-                        model.loadMovies();
-                      },
-                      icon: const Icon(Icons.cancel),
-                    )
-                  : null,
-              labelText: 'Поиск',
-              border: const OutlineInputBorder(),
-              filled: true,
-              fillColor: Colors.white.withAlpha(230),
-            ),
-          ),
-        )
-      ],
+    final model = context.read<MovieModel>();
+    return TextField(
+      focusNode: _focusNode,
+      controller: _controller,
+      textInputAction: TextInputAction.search,
+      textCapitalization: TextCapitalization.words,
+      onSubmitted: (value) {
+        if (value != '') {
+          model.searchMoviesOfName(query: value.toLowerCase());
+        }
+      },
+      decoration: InputDecoration(
+        suffixIcon: _showClearButton
+            ? IconButton(
+                onPressed: () {
+                  _controller.clear();
+                  FocusScope.of(context).unfocus();
+                  model.loadMovies();
+                },
+                icon: const Icon(Icons.cancel),
+              )
+            : null,
+        labelText: 'Поиск',
+        border: const OutlineInputBorder(),
+        filled: true,
+        fillColor: Colors.white.withAlpha(230),
+      ),
     );
   }
 }
@@ -182,7 +128,7 @@ class CellMovesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final posterPath = movies.posterPath;
-    final model = MovieProvider.read(context)?.model;
+    final model = context.read<MovieModel>();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(children: [
@@ -243,7 +189,7 @@ class CellMovesWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      model?.getDateToString(movies.releaseDate) ?? '',
+                      model.getDateToString(movies.releaseDate),
                       style: const TextStyle(color: Colors.grey),
                     ),
                     Text(

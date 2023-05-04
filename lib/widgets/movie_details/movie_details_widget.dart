@@ -1,28 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:themoviedb/widgets/movie_details/models/movie_detail_model.dart';
 import 'package:themoviedb/widgets/movie_details/widgets/movie_detail_cell_info_widget.dart';
 
-class MovieDetailsWidget extends StatefulWidget {
-  const MovieDetailsWidget({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<MovieDetailsWidget> createState() => _MovieDetailsWidgetState();
-}
-
-class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final model = MovieDetailProvider.watch(context)?.model;
-    model?.setupLocale(context);
-  }
+class MovieDetailsWidget extends StatelessWidget {
+  const MovieDetailsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)?.model;
-    model?.setupLocale(context);
+    final model = context.watch<MovieDetailModel>();
+    model.setupLocale(context);
     return Scaffold(
       appBar: AppBar(
         title: const _Title(),
@@ -47,7 +34,7 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = MovieDetailProvider.watch(context)?.model;
+    final model = context.watch<MovieDetailModel>();
     return Text(model?.movie?.title ?? '');
   }
 }

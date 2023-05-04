@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:themoviedb/domain/data_provider/session_data_provider.dart';
 import 'package:themoviedb/services/navigation/navigation_service.dart';
 import 'package:themoviedb/widgets/movie_list/models/movie_model.dart';
 import 'package:themoviedb/widgets/movie_list/movie_list_widget.dart';
+import 'package:themoviedb/widgets/news_screen/model/news_screen_model.dart';
+import 'package:themoviedb/widgets/news_screen/widgets/news_widget.dart';
 
 class MainScreenWidget extends StatefulWidget {
   const MainScreenWidget({Key? key}) : super(key: key);
@@ -65,9 +68,16 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         ],
       ),
       body: IndexedStack(index: _selectedPage, children: [
-        MovieProvider(model: movieModel, child: const MovieListWidget()),
-        MovieProvider(model: movieModel, child: const MovieListWidget()),
-        MovieProvider(model: movieModel, child: const MovieListWidget()),
+        // ChangeNotifierProvider(
+        //     create: (context) => NewsScreenModel(),
+        //     builder: (context, child) => const NewsWidget()),
+        ChangeNotifierProvider(
+            create: (context) => NewsScreenModel(), child: const NewsWidget()),
+        ChangeNotifierProvider(
+            create: (context) => movieModel, child: const MovieListWidget()),
+        ChangeNotifierProvider(
+            create: (context) => movieModel, child: const MovieListWidget()),
+        // MovieProvider(model: movieModel, child: const MovieListWidget()),
       ]),
     );
   }

@@ -72,22 +72,22 @@ class MovieModel extends ChangeNotifier {
 }
 
 //MARK: Inherited
-class MovieProvider extends InheritedNotifier {
-  final MovieModel model;
-  const MovieProvider({
-    Key? key,
-    required this.model,
-    required Widget child,
-  }) : super(key: key, child: child, notifier: model);
-
-  static MovieProvider? watch(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<MovieProvider>();
-  }
-
-  static MovieProvider? read(BuildContext context) {
-    final widget = context
-        .getElementForInheritedWidgetOfExactType<MovieProvider>()
-        ?.widget;
-    return widget is MovieProvider ? widget : null;
-  }
-}
+// class MovieProvider extends InheritedNotifier {
+//   final MovieModel model;
+//   const MovieProvider({
+//     Key? key,
+//     required this.model,
+//     required Widget child,
+//   }) : super(key: key, child: child, notifier: model);
+//
+//   static MovieProvider? watch(BuildContext context) {
+//     return context.dependOnInheritedWidgetOfExactType<MovieProvider>();
+//   }
+//
+//   static MovieProvider? read(BuildContext context) {
+//     final widget = context
+//         .getElementForInheritedWidgetOfExactType<MovieProvider>()
+//         ?.widget;
+//     return widget is MovieProvider ? widget : null;
+//   }
+// }
